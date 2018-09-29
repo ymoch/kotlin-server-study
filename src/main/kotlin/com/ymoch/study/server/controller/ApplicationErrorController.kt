@@ -1,11 +1,10 @@
 package com.ymoch.study.server.controller
 
+import com.ymoch.study.server.entity.ErrorRecord
 import com.ymoch.study.server.exception.ApplicationRuntimeException
+import com.ymoch.study.server.service.ErrorService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.web.servlet.error.ErrorAttributes
 import org.springframework.boot.web.servlet.error.ErrorController
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -18,26 +17,15 @@ import javax.servlet.http.HttpServletResponse
 class ApplicationErrorController : ErrorController {
 
     @Autowired
-    lateinit var errorAttributes: ErrorAttributes
-
-    @Value("\${debug:false}")
-    var debug: Boolean = false
+    lateinit var errorService: ErrorService
 
     override fun getErrorPath(): String = "/error"
 
     @GetMapping
-    fun showError(request: WebRequest, response: HttpServletResponse): Map<String, Any?> {
-        val error: Throwable? = errorAttributes.getError(request)
-        val attributes = errorAttributes.getErrorAttributes(request, debug)
-        val cause = decideCause(error, attributes)
-
-        response.status = cause.status
-        return mapOf(
-                "timestamp" to attributes["timestamp"],
-                "status" to cause.status,
-                "error" to HttpStatus.valueOf(cause.status).reasonPhrase,
-                "message" to cause.message
-        )
+    fun showError(request: WebRequest, response: HttpServletResponse): ErrorRecord {
+        val record = errorService.createEntity(request)
+        response.status = record.status
+        return record
     }
 
     @GetMapping(path = ["raise"])
@@ -49,19 +37,4 @@ class ApplicationErrorController : ErrorController {
     fun raiseErrorUnexpected() {
         throw RuntimeException("An Unexpected error occurred.")
     }
-}
-
-fun decideCause(error: Throwable?, requestAttributes: Map<String, Any>): ApplicationRuntimeException {
-    if (error == null) {
-        return ApplicationRuntimeException(
-                message = requestAttributes["error"] as? String ?: "No messages.",
-                status = Integer.valueOf(requestAttributes["status"] as? String ?: "500"))
-    }
-    if (error !is ApplicationRuntimeException) {
-        return ApplicationRuntimeException(
-                message = error.message ?: "Unexpected error.",
-                cause = error,
-                status = 500)
-    }
-    return error
 }
