@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse
 class ApplicationErrorController : ErrorController {
 
     @Autowired
-    lateinit var errorService: ErrorService
+    private lateinit var errorService: ErrorService
 
     override fun getErrorPath(): String = "/error"
 

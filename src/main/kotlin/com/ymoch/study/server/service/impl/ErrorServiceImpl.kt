@@ -16,10 +16,10 @@ val DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR
 class ErrorServiceImpl : ErrorService {
 
     @Autowired
-    lateinit var errorAttributes: ErrorAttributes
+    private lateinit var errorAttributes: ErrorAttributes
 
     @Value("\${debug:false}")
-    var debug: Boolean = false
+    private var debug = false
 
     override fun createEntity(request: WebRequest): ErrorRecord {
         val error: Throwable? = errorAttributes.getError(request)
