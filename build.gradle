@@ -24,9 +24,10 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     compile 'org.springframework.boot:spring-boot-starter-web'
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin"
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile "org.springframework.boot:spring-boot-starter-test"
+    compile 'com.fasterxml.jackson.module:jackson-module-kotlin'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 }

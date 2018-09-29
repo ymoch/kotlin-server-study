@@ -7,16 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.servlet.error.ErrorAttributes
 import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.web.context.request.WebRequest
 
 val DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR
 
+@Component
 @Service
-class ErrorServiceImpl : ErrorService {
-
-    @Autowired
-    private lateinit var errorAttributes: ErrorAttributes
+class ErrorServiceImpl(private val errorAttributes: ErrorAttributes) : ErrorService {
 
     @Value("\${debug:false}")
     private var debug = false
