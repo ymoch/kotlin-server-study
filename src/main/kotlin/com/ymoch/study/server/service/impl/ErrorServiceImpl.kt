@@ -28,7 +28,7 @@ class ErrorServiceImpl(
         }
 
         if (error !is ApplicationRuntimeException) {
-            val message = error.message ?: "Unexpected error."
+            val message = error.message
             return ErrorRecord(DEFAULT_STATUS.value(), message)
         }
 
