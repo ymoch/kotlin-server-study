@@ -1,4 +1,4 @@
-package com.ymoch.study.server.entrypoint
+package com.ymoch.study.server
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

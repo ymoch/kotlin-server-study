@@ -1,6 +1,6 @@
 package com.ymoch.study.server.service.impl
 
-import com.ymoch.study.server.entity.ErrorRecord
+import com.ymoch.study.server.record.ErrorRecord
 import com.ymoch.study.server.exception.ApplicationRuntimeException
 import com.ymoch.study.server.service.ErrorService
 import org.springframework.beans.factory.annotation.Value

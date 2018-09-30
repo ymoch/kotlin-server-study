@@ -1,4 +1,4 @@
-package com.ymoch.study.server.entity
+package com.ymoch.study.server.record
 
 import org.springframework.http.HttpStatus
 
