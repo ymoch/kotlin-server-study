@@ -89,15 +89,29 @@ internal class ErrorServiceImplTest {
     }
 
     @Nested
-    inner class WhenGivenApplicationRuntimeException {
+    inner class WhenGivenNormalApplicationRuntimeException {
         @Test
         fun thenSetsItsStatus() {
-            `when`(errorAttributes.getError(any()))
-                    .thenReturn(ApplicationRuntimeException(status = 503, message = "message"))
+            val exception = ApplicationRuntimeException(
+                    status = 503, message = "message", cause = RuntimeException("cause"))
+            `when`(errorAttributes.getError(any())).thenReturn(exception)
 
             val record = service.createRecord(request)
             assertThat(record.status, equalTo(503))
             assertThat(record.message, equalTo("message"))
+        }
+    }
+
+    @Nested
+    inner class WhenGivenEmptyApplicationRuntimeException {
+        @Test
+        fun thenSetsItsStatus() {
+            val exception = ApplicationRuntimeException()
+            `when`(errorAttributes.getError(any())).thenReturn(exception)
+
+            val record = service.createRecord(request)
+            assertThat(record.status, equalTo(500))
+            assertThat(record.message, equalTo(null as String?))
         }
     }
 }

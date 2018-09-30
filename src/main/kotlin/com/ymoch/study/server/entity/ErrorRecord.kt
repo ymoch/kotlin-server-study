@@ -9,6 +9,4 @@ class ErrorRecord(val status: Int, val error: String, val message: String?) {
             error = HttpStatus.valueOf(status).reasonPhrase,
             message = message
     )
-
-    constructor(status: Int) : this(status = status, message = null)
 }

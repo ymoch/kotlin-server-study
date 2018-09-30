@@ -35,6 +35,6 @@ class ApplicationErrorController(
 
     @GetMapping(path = ["raise/unexpected"])
     fun raiseErrorUnexpected() {
-        throw RuntimeException("An Unexpected error occurred.")
+        throw RuntimeException("An unexpected error occurred.")
     }
 }
