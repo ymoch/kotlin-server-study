@@ -27,11 +27,7 @@ class ErrorServiceImpl(
             return ErrorRecord(status.value(), message)
         }
 
-        if (error !is ApplicationRuntimeException) {
-            val message = error.message
-            return ErrorRecord(DEFAULT_STATUS.value(), message)
-        }
-
-        return ErrorRecord(error.status, error.message)
+        val status = (error as? ApplicationRuntimeException)?.status ?: DEFAULT_STATUS.value()
+        return ErrorRecord(status, error.message)
     }
 }
