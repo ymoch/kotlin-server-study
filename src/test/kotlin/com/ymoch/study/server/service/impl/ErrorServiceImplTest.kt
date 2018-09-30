@@ -69,7 +69,7 @@ internal class ErrorServiceImplTest {
             `when`(errorAttributes.getErrorAttributes(request, false))
                     .thenReturn(attributes)
 
-            val record = service.createEntity(request)
+            val record = service.createRecord(request)
             assertThat(record.status, equalTo(expectedStatus))
             assertThat(record.message, equalTo(expectedMessage))
         }
@@ -82,7 +82,7 @@ internal class ErrorServiceImplTest {
             `when`(errorAttributes.getError(any()))
                     .thenReturn(RuntimeException("message"))
 
-            val record = service.createEntity(request)
+            val record = service.createRecord(request)
             assertThat(record.status, equalTo(500))
             assertThat(record.message, equalTo("message"))
         }
@@ -95,7 +95,7 @@ internal class ErrorServiceImplTest {
             `when`(errorAttributes.getError(any()))
                     .thenReturn(ApplicationRuntimeException(status = 503, message = "message"))
 
-            val record = service.createEntity(request)
+            val record = service.createRecord(request)
             assertThat(record.status, equalTo(503))
             assertThat(record.message, equalTo("message"))
         }

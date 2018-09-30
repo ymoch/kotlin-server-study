@@ -23,7 +23,7 @@ class ApplicationErrorController(
 
     @GetMapping
     fun showError(request: WebRequest, response: HttpServletResponse): ErrorRecord {
-        val record = errorService.createEntity(request)
+        val record = errorService.createRecord(request)
         response.status = record.status
         return record
     }

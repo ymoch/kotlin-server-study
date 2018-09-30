@@ -17,7 +17,7 @@ class ErrorServiceImpl(
         @Value("\${debug:false}") private val debug: Boolean
 ) : ErrorService {
 
-    override fun createEntity(request: WebRequest): ErrorRecord {
+    override fun createRecord(request: WebRequest): ErrorRecord {
         val error: Throwable? = errorAttributes.getError(request)
         val attributes = errorAttributes.getErrorAttributes(request, debug)
 

@@ -4,5 +4,5 @@ import com.ymoch.study.server.entity.ErrorRecord
 import org.springframework.web.context.request.WebRequest
 
 interface ErrorService {
-    fun createEntity(request: WebRequest): ErrorRecord
+    fun createRecord(request: WebRequest): ErrorRecord
 }
