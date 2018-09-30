@@ -27,7 +27,7 @@ dependencies {
     compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'com.fasterxml.jackson.module:jackson-module-kotlin'
-    testCompile 'junit:junit:4.12'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.3.1'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }

@@ -22,7 +22,7 @@ class ErrorServiceImpl(
         val attributes = errorAttributes.getErrorAttributes(request, debug)
 
         if (error == null) {
-            val status = HttpStatus.resolve(attributes["status"] as Int) ?: DEFAULT_STATUS;
+            val status = HttpStatus.resolve(attributes["status"] as Int) ?: DEFAULT_STATUS
             val message = attributes["error"] as? String
             return ErrorRecord(status.value(), message)
         }
