@@ -13,9 +13,10 @@ class HelloController {
 
     @GetMapping(path = ["world"])
     fun sayHello(
-            @RequestParam(required = false) target: String
+            @RequestParam(required = false) target: String?
     ): GreetingRecord {
-        val message = "Hello, ${target}."
-        return GreetingRecord(message = message, target = target)
+        val finalTarget = target ?: "world"
+        val message = "Hello, $finalTarget."
+        return GreetingRecord(message = message, target = finalTarget)
     }
 }
