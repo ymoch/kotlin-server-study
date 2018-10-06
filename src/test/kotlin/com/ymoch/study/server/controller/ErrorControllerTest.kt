@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.MockitoAnnotations
 
 internal class ErrorControllerTest {
 
@@ -15,7 +14,6 @@ internal class ErrorControllerTest {
 
     @BeforeEach
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
         controller = ErrorController()
     }
 
