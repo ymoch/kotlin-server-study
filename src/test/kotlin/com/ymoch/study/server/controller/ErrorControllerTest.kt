@@ -1,38 +1,39 @@
 package com.ymoch.study.server.controller
 
-import com.ymoch.study.server.exception.ApplicationRuntimeException
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@AutoConfigureMockMvc
 internal class ErrorControllerTest {
 
-    private lateinit var controller: ErrorController
-
-    @BeforeEach
-    fun setUp() {
-        controller = ErrorController()
-    }
+    @Autowired
+    private lateinit var mockMvc: MockMvc
 
     @Nested
-    inner class RaiseErrorTest {
+    inner class ErrorRaiseTest {
         @Test
         fun raisesApplicationRuntimeException() {
-            val exception = assertThrows<ApplicationRuntimeException> { controller.raiseError() }
-            assertThat(exception.status, equalTo(400))
-            assertThat(exception.message, equalTo("An expected error occurred."))
+            mockMvc.perform(MockMvcRequestBuilders.get("/error/raise"))
+                    .andExpect(status().isBadRequest)
         }
     }
 
     @Nested
-    inner class RaiseErrorUnexpectedTest {
+    inner class ErrorRaiseUnexpectedTest {
         @Test
         fun raisesRuntimeException() {
-            val exception = assertThrows<RuntimeException> { controller.raiseErrorUnexpected() }
-            assertThat(exception.message, equalTo("An unexpected error occurred."))
+            mockMvc.perform(MockMvcRequestBuilders.get("/error/raise/unexpected"))
+                    .andExpect(status().isInternalServerError)
         }
     }
 }
