@@ -37,7 +37,7 @@ internal class DebugFilterTest {
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         filter = DebugFilter(conversionService)
-        filter.debugService = debugService
+        filter.setDebugService(debugService)
 
         `when`(conversionService.convert("on", Boolean::class.java)).thenReturn(true)
         `when`(conversionService.convert("off", Boolean::class.java)).thenReturn(false)

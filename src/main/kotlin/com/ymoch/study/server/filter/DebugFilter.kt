@@ -21,8 +21,13 @@ class DebugFilter(
         private val conversionService: ConversionService
 ) : OncePerRequestFilter() {
 
-    @Autowired // Since this service's scope is request.
-    lateinit var debugService: DebugService
+    // Since this service's scope is request.
+    private lateinit var debugService: DebugService
+
+    @Autowired
+    fun setDebugService(debugService: DebugService) {
+        this.debugService = debugService
+    }
 
     override fun doFilterInternal(
             request: HttpServletRequest,
