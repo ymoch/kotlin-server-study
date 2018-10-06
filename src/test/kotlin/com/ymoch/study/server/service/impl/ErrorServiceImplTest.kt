@@ -15,28 +15,21 @@ import org.mockito.MockitoAnnotations
 
 internal class ErrorServiceImplTest {
 
-    @Mock
-    private lateinit var debugService: DebugService
-
     private lateinit var service: ErrorServiceImpl
 
     @BeforeEach
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
         service = ErrorServiceImpl()
-        service.debugService = debugService
     }
 
     @Nested
     inner class WhenGivenRuntimeException {
         @Test
         fun thenSetsDefaultStatus() {
-            `when`(debugService.debugModeEnabled()).thenReturn(true)
             val exception = RuntimeException("message")
             val record = service.createRecord(exception)
             assertThat(record.status, equalTo(500))
             assertThat(record.message, equalTo("message"))
-            verify(debugService, times(1)).requestDebugModeEnabled()
         }
     }
 
@@ -44,13 +37,11 @@ internal class ErrorServiceImplTest {
     inner class WhenGivenNormalApplicationRuntimeException {
         @Test
         fun thenSetsItsStatus() {
-            `when`(debugService.debugModeEnabled()).thenReturn(false)
             val exception = ApplicationRuntimeException(
                     status = 503, message = "message", cause = RuntimeException("cause"))
             val record = service.createRecord(exception)
             assertThat(record.status, equalTo(503))
             assertThat(record.message, equalTo("message"))
-            verify(debugService, times(1)).requestDebugModeEnabled()
         }
     }
 
@@ -58,12 +49,10 @@ internal class ErrorServiceImplTest {
     inner class WhenGivenEmptyApplicationRuntimeException {
         @Test
         fun thenSetsItsStatus() {
-            `when`(debugService.debugModeEnabled()).thenReturn(false)
             val exception = ApplicationRuntimeException()
             val record = service.createRecord(exception)
             assertThat(record.status, equalTo(500))
             assertThat(record.message, equalTo(null as String?))
-            verify(debugService, times(1)).requestDebugModeEnabled()
         }
     }
 }

@@ -5,9 +5,7 @@ import org.springframework.http.HttpStatus
 class ErrorRecord(
         val status: Int,
         val error: String,
-        val message: String?,
-        val name: String?,
-        val stackTrace: List<String>?) {
+        val message: String?) {
 
     constructor(
             status: Int,
@@ -17,8 +15,6 @@ class ErrorRecord(
     ) : this(
             status = status,
             error = HttpStatus.valueOf(status).reasonPhrase,
-            message = message,
-            name = name,
-            stackTrace = stackTrace
+            message = message
     )
 }
