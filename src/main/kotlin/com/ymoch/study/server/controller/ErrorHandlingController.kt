@@ -12,8 +12,13 @@ import javax.servlet.http.HttpServletResponse
 @RestControllerAdvice
 class ErrorHandlingController(val errorService: ErrorService) {
 
-    @Autowired // Since this service's scope is request.
-    lateinit var debugService: DebugService
+    // Since this service's scope is request.
+    private lateinit var debugService: DebugService
+
+    @Autowired
+    fun setDebugService(debugService: DebugService) {
+        this.debugService = debugService
+    }
 
     @ExceptionHandler(Exception::class)
     fun handleException(
