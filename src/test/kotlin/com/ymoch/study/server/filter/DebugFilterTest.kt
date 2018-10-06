@@ -61,7 +61,7 @@ internal class DebugFilterTest {
     }
 
     @Nested
-    inner class WHenDebugModeIsEnabled {
+    inner class WhenDebugModeIsEnabled {
         @BeforeEach
         fun setUp() {
             `when`(debugService.debugModeEnabled()).thenReturn(true)
@@ -73,9 +73,7 @@ internal class DebugFilterTest {
             @Test
             fun thenRunsDefaultFilterChain() {
                 `when`(request.getParameter("_debug")).thenReturn(null)
-
-                filter.doFilter(request, response, filterChain)
-                verify(filterChain, times(1)).doFilter(request, response)
+                testRunsDefaultFilterChain()
             }
         }
 
@@ -85,10 +83,26 @@ internal class DebugFilterTest {
             @Test
             fun thenRunsDefaultFilterChain() {
                 `when`(request.getParameter("_debug")).thenReturn("off")
-
-                filter.doFilter(request, response, filterChain)
-                verify(filterChain, times(1)).doFilter(request, response)
+                testRunsDefaultFilterChain()
+                verify(conversionService).convert("off", Boolean::class.java)
             }
+        }
+
+        @Nested
+        inner class WhenGivenInvalidDebuggingParameter {
+            @Test
+            fun thenRunsDefaultFilterChain() {
+                `when`(conversionService.convert("invalid", Boolean::class.java))
+                        .thenThrow(IllegalArgumentException())
+                `when`(request.getParameter("_debug")).thenReturn("invalid")
+                testRunsDefaultFilterChain()
+                verify(conversionService).convert("invalid", Boolean::class.java)
+            }
+        }
+
+        private fun testRunsDefaultFilterChain() {
+            filter.doFilter(request, response, filterChain)
+            verify(filterChain, times(1)).doFilter(request, response)
         }
     }
 }
