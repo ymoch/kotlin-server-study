@@ -2,10 +2,12 @@ package com.ymoch.study.server.service.impl
 
 import com.ymoch.study.server.record.ErrorRecord
 import com.ymoch.study.server.exception.ApplicationRuntimeException
+import com.ymoch.study.server.service.DebugService
 import com.ymoch.study.server.service.ErrorService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.NoHandlerFoundException
 import java.lang.Exception
 import java.util.Arrays
@@ -15,17 +17,18 @@ val DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR
 
 @Service
 class ErrorServiceImpl(
-        @Value("\${debugging:false}") private val debugging: Boolean
+        private val debugService: DebugService
 ) : ErrorService {
 
-    override fun createRecord(exception: Exception): ErrorRecord {
+    override fun createRecord(exception: Exception, request: WebRequest): ErrorRecord {
         val status = when (exception) {
             is ApplicationRuntimeException -> exception.status
             is NoHandlerFoundException -> HttpStatus.NOT_FOUND.value()
             else -> DEFAULT_STATUS.value()
         }
-        val exceptionName = if (debugging) exception::class.qualifiedName else null
-        val stackTrace: List<String>? = if (debugging) {
+        val isDebugging = debugService.isDebugging(request)
+        val exceptionName = if (isDebugging) exception::class.qualifiedName else null
+        val stackTrace: List<String>? = if (isDebugging) {
             Arrays.stream(exception.stackTrace)
                     .map { toStackTraceLine(it) }
                     .collect(Collectors.toList())
