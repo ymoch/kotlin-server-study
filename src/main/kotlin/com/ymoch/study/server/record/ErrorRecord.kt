@@ -9,9 +9,7 @@ class ErrorRecord(
 
     constructor(
             status: Int,
-            message: String? = null,
-            name: String? = null,
-            stackTrace: List<String>? = null
+            message: String? = null
     ) : this(
             status = status,
             error = HttpStatus.valueOf(status).reasonPhrase,

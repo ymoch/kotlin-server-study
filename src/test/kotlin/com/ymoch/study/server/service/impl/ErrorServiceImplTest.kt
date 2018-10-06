@@ -1,17 +1,14 @@
 package com.ymoch.study.server.service.impl
 
 import com.ymoch.study.server.exception.ApplicationRuntimeException
-import com.ymoch.study.server.service.DebugService
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
+import org.mockito.Mockito.mock
+import org.springframework.web.servlet.NoHandlerFoundException
 
 internal class ErrorServiceImplTest {
 
@@ -29,6 +26,19 @@ internal class ErrorServiceImplTest {
             val exception = RuntimeException("message")
             val record = service.createRecord(exception)
             assertThat(record.status, equalTo(500))
+            assertThat(record.message, equalTo("message"))
+        }
+    }
+
+    @Nested
+    inner class WhenGivenNoHandlerFoundException {
+        @Test
+        fun thenSetsNotFoundStatus() {
+            val exception = mock(NoHandlerFoundException::class.java)
+            `when`(exception.message).thenReturn("message")
+
+            val record = service.createRecord(exception)
+            assertThat(record.status, equalTo(404))
             assertThat(record.message, equalTo("message"))
         }
     }

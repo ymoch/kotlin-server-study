@@ -31,7 +31,7 @@ class DebugServiceImpl(
     }
 
     override fun registerException(exception: Exception) {
-        recorder?.exception = exception
+        recorder?.registerException(exception)
     }
 
     override fun createRequestDebugRecord(): DebugRecord? {
@@ -40,7 +40,11 @@ class DebugServiceImpl(
 }
 
 class Recorder {
-    var exception: Exception? = null
+    private var exception: Exception? = null
+
+    fun registerException(exception: Exception) {
+        this.exception = exception
+    }
 
     fun toDebugRecord(): DebugRecord {
         val exceptionRecord = exception?.let { it ->
