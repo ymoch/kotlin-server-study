@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.ymoch.study.server.service.DebugService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.convert.ConversionException
 import org.springframework.core.convert.ConversionService
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -75,10 +76,10 @@ fun isDebugParameterEnabled(
         request: ServletRequest,
         conversionService: ConversionService
 ): Boolean {
-    val debugParameter: String = request.getParameter("_debug") ?: return false
+    val debugParameter = request.getParameter("_debug")
     return try {
         conversionService.convert(debugParameter, Boolean::class.java) ?: false
-    } catch (ignored: IllegalArgumentException) {
+    } catch (ignored: ConversionException) {
         false
     }
 }

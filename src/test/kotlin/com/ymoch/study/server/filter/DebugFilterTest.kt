@@ -6,9 +6,11 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
+import org.springframework.core.convert.ConversionException
 import org.springframework.core.convert.ConversionService
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
@@ -39,8 +41,11 @@ internal class DebugFilterTest {
         filter = DebugFilter(conversionService)
         filter.setDebugService(debugService)
 
+        `when`(conversionService.convert(null, Boolean::class.java)).thenReturn(null)
         `when`(conversionService.convert("on", Boolean::class.java)).thenReturn(true)
         `when`(conversionService.convert("off", Boolean::class.java)).thenReturn(false)
+        `when`(conversionService.convert("invalid", Boolean::class.java))
+                .thenThrow(mock(ConversionException::class.java))
     }
 
     @Nested
@@ -52,12 +57,7 @@ internal class DebugFilterTest {
         }
 
         @Test
-        fun thenRunsDefaultFilterChain() {
-            `when`(request.getParameter("_debug")).thenReturn("on")
-
-            filter.doFilter(request, response, filterChain)
-            verify(filterChain, times(1)).doFilter(request, response)
-        }
+        fun thenRunsDefaultFilterChain() = testRunsDefaultFilterChain(null)
     }
 
     @Nested
@@ -69,40 +69,30 @@ internal class DebugFilterTest {
 
         @Nested
         inner class WhenNotGivenDebugParameter {
-
             @Test
-            fun thenRunsDefaultFilterChain() {
-                `when`(request.getParameter("_debug")).thenReturn(null)
-                testRunsDefaultFilterChain()
-            }
+            fun thenRunsDefaultFilterChain() =
+                    testRunsDefaultFilterChain(null)
         }
 
         @Nested
         inner class WhenGivenNotDebuggingParameter {
-
             @Test
-            fun thenRunsDefaultFilterChain() {
-                `when`(request.getParameter("_debug")).thenReturn("off")
-                testRunsDefaultFilterChain()
-                verify(conversionService).convert("off", Boolean::class.java)
-            }
+            fun thenRunsDefaultFilterChain() =
+                    testRunsDefaultFilterChain("off")
         }
 
         @Nested
         inner class WhenGivenInvalidDebuggingParameter {
             @Test
-            fun thenRunsDefaultFilterChain() {
-                `when`(conversionService.convert("invalid", Boolean::class.java))
-                        .thenThrow(IllegalArgumentException())
-                `when`(request.getParameter("_debug")).thenReturn("invalid")
-                testRunsDefaultFilterChain()
-                verify(conversionService).convert("invalid", Boolean::class.java)
-            }
+            fun thenRunsDefaultFilterChain() =
+                    testRunsDefaultFilterChain("invalid")
         }
 
-        private fun testRunsDefaultFilterChain() {
-            filter.doFilter(request, response, filterChain)
-            verify(filterChain, times(1)).doFilter(request, response)
-        }
+    }
+
+    private fun testRunsDefaultFilterChain(debugParam: String?) {
+        `when`(request.getParameter("_debug")).thenReturn(debugParam)
+        filter.doFilter(request, response, filterChain)
+        verify(filterChain, times(1)).doFilter(request, response)
     }
 }
