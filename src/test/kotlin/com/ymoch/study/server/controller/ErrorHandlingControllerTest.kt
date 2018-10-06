@@ -1,6 +1,5 @@
 package com.ymoch.study.server.controller
 
-import com.ymoch.study.server.exception.ApplicationRuntimeException
 import com.ymoch.study.server.record.ErrorRecord
 import com.ymoch.study.server.service.DebugService
 import com.ymoch.study.server.service.ErrorService
