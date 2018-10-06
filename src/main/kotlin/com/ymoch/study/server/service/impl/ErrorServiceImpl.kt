@@ -8,6 +8,7 @@ import org.springframework.boot.web.servlet.error.ErrorAttributes
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.context.request.WebRequest
+import org.springframework.web.servlet.NoHandlerFoundException
 
 val DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR
 
@@ -23,11 +24,15 @@ class ErrorServiceImpl(
 
         if (error == null) {
             val status = HttpStatus.resolve(attributes["status"] as Int) ?: DEFAULT_STATUS
-            val message = attributes["error"] as? String
+            val message = attributes["error"] as String?
             return ErrorRecord(status.value(), message)
         }
 
-        val status = (error as? ApplicationRuntimeException)?.status ?: DEFAULT_STATUS.value()
+        val status = when (error) {
+            is ApplicationRuntimeException -> error.status
+            is NoHandlerFoundException -> HttpStatus.NOT_FOUND.value()
+            else -> DEFAULT_STATUS.value()
+        }
         return ErrorRecord(status, error.message)
     }
 }
