@@ -10,8 +10,6 @@ import org.springframework.core.convert.ConversionService
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingResponseWrapper
-import java.io.UnsupportedEncodingException
-import java.nio.charset.Charset
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
 import javax.servlet.http.HttpServletRequest
@@ -19,8 +17,15 @@ import javax.servlet.http.HttpServletResponse
 
 @Component
 class DebugFilter(
-        private val conversionService: ConversionService
+        private val conversionService: ConversionService,
+        private val responseWrapperCreator: (HttpServletResponse) -> ContentCachingResponseWrapper
 ) : OncePerRequestFilter() {
+
+    @Autowired
+    constructor(conversionService: ConversionService)
+            : this(conversionService, { response: HttpServletResponse ->
+        ContentCachingResponseWrapper(response)
+    })
 
     // Since this service's scope is request.
     private lateinit var debugService: DebugService
@@ -43,7 +48,7 @@ class DebugFilter(
 
         debugService.enableRequestDebugMode()
 
-        val wrappedResponse = ContentCachingResponseWrapper(response)
+        val wrappedResponse = responseWrapperCreator(response)
         try {
             doFilterForWrappedResponse(request, wrappedResponse, filterChain)
         } finally {
