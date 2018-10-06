@@ -114,6 +114,18 @@ internal class DebugServiceImplTest {
                             equalTo("declaringClass.methodName(fileName:1)"))
                 }
             }
+
+            @Nested
+            inner class WhenExceptionIsSet {
+
+                @Test
+                fun thenSetsExceptionClassName() {
+                    service.registerException(Exception())
+                    val record = service.createRequestDebugRecord()!!
+                    val exceptionRecord = record.exception!!
+                    assertThat(exceptionRecord.className, equalTo("java.lang.Exception"))
+                }
+            }
         }
     }
 }
