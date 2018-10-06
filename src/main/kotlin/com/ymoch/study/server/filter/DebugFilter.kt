@@ -15,6 +15,10 @@ import javax.servlet.ServletRequest
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+val DEFAULT_RESPONSE_WRAPPER_CREATOR = { response: HttpServletResponse ->
+    ContentCachingResponseWrapper(response)
+}
+
 @Component
 class DebugFilter(
         private val conversionService: ConversionService,
@@ -23,9 +27,7 @@ class DebugFilter(
 
     @Autowired
     constructor(conversionService: ConversionService)
-            : this(conversionService, { response: HttpServletResponse ->
-        ContentCachingResponseWrapper(response)
-    })
+            : this(conversionService, DEFAULT_RESPONSE_WRAPPER_CREATOR)
 
     // Since this service's scope is request.
     private lateinit var debugService: DebugService
