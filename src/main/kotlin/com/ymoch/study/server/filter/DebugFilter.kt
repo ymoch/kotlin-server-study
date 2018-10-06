@@ -57,15 +57,9 @@ class DebugFilter(
         filterChain.doFilter(request, wrappedResponse)
 
         val mapper = ObjectMapper()
-        val content = try {
-            String(wrappedResponse.contentAsByteArray,
-                    Charset.forName(request.characterEncoding))
-        } catch (ignored: UnsupportedEncodingException) {
-            return
-        }
-
+        val inStream = wrappedResponse.contentInputStream
         val map = try {
-            mapper.readValue<LinkedHashMap<String, Any?>>(content)
+            mapper.readValue<LinkedHashMap<String, Any?>>(inStream)
         } catch (ignored: JsonMappingException) {
             return
         }
