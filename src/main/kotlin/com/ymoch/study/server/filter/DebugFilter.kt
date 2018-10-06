@@ -37,9 +37,7 @@ class DebugFilter(
 
         debugService.enableRequestDebugMode()
 
-        val wrappedResponse =
-                response as? ContentCachingResponseWrapper
-                        ?: ContentCachingResponseWrapper(response)
+        val wrappedResponse = ContentCachingResponseWrapper(response)
         try {
             doFilterForWrappedResponse(request, wrappedResponse, filterChain)
         } finally {
