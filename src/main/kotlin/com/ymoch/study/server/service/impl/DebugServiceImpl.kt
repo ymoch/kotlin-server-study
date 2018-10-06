@@ -2,34 +2,25 @@ package com.ymoch.study.server.service.impl
 
 import com.ymoch.study.server.service.DebugService
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.convert.ConversionService
+import org.springframework.context.annotation.Scope
+import org.springframework.context.annotation.ScopedProxyMode
 import org.springframework.stereotype.Service
-import org.springframework.web.context.request.WebRequest
-
-private class EmptyDebugService : DebugService
-
-private class RequestDebugService(
-        private val conversionService: ConversionService
-) : DebugService {
-    override fun isDebugging() = true
-    override fun isDebugging(request: WebRequest): Boolean {
-        val debugParam = request.getParameter("_debug") ?: return false
-        return try {
-            conversionService.convert(debugParam, Boolean::class.java) ?: false
-        } catch (ignored: IllegalArgumentException) {
-            false
-        }
-    }
-}
-
-fun decideDerivingService(debugging: Boolean, conversionService: ConversionService) = if (!debugging) {
-    EmptyDebugService()
-} else {
-    RequestDebugService(conversionService)
-}
+import org.springframework.web.context.WebApplicationContext
 
 @Service
+@Scope(WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 class DebugServiceImpl(
-        @Value("\${debugging:false}") debugging: Boolean,
-        conversionService: ConversionService
-) : DebugService by decideDerivingService(debugging, conversionService)
+        @Value("\${debugging:false}") private val debugMode: Boolean
+) : DebugService {
+    var requestDebugMode: Boolean = false
+
+    override fun debugModeEnabled() = debugMode
+    override fun enableRequestDebugMode() {
+        if (!debugMode) {
+            return
+        }
+        requestDebugMode = true
+    }
+
+    override fun requestDebugModeEnabled() = requestDebugMode
+}
