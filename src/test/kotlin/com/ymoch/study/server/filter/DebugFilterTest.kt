@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations
 import org.springframework.context.ApplicationContext
 import org.springframework.core.convert.ConversionException
 import org.springframework.core.convert.ConversionService
+import org.springframework.web.util.ContentCachingResponseWrapper
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -24,6 +25,12 @@ internal class DebugFilterTest {
 
     @Mock
     private lateinit var conversionService: ConversionService
+
+    @Mock
+    private lateinit var jsonResponseEditor: JsonResponseEditor
+
+    @Mock
+    private lateinit var wrap: (HttpServletResponse) -> ContentCachingResponseWrapper
 
     @Mock
     private lateinit var debugService: DebugService
@@ -42,7 +49,7 @@ internal class DebugFilterTest {
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        filter = DebugFilter(context, conversionService)
+        filter = DebugFilter(context, conversionService, jsonResponseEditor, wrap)
 
         `when`(context.getBean(DebugService::class.java)).thenReturn(debugService)
     }
@@ -99,8 +106,12 @@ internal class DebugFilterTest {
 
         @Nested
         inner class WhenGivenDebuggingParameter {
+            private lateinit var wrappedResponse: ContentCachingResponseWrapper
+
             @BeforeEach
             fun setUp() {
+                wrappedResponse = mock(ContentCachingResponseWrapper::class.java)
+
                 `when`(conversionService.convert("on", Boolean::class.java)).thenReturn(true)
             }
         }

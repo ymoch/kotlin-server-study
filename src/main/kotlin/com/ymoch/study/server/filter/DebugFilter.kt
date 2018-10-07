@@ -23,14 +23,16 @@ fun wrapDefaultly(response: HttpServletResponse) =
 class DebugFilter(
         private val context: ApplicationContext,
         private val conversionService: ConversionService,
+        private val editor: JsonResponseEditor,
         private val wrap: (HttpServletResponse) -> ContentCachingResponseWrapper
 ) : OncePerRequestFilter() {
 
     @Autowired
     constructor(
             context: ApplicationContext,
-            conversionService: ConversionService
-    ) : this(context, conversionService, ::wrapDefaultly)
+            conversionService: ConversionService,
+            editor: JsonResponseEditor
+    ) : this(context, conversionService, editor, ::wrapDefaultly)
 
     override fun doFilterInternal(
             request: HttpServletRequest,
@@ -48,30 +50,15 @@ class DebugFilter(
         debugService.enableRequestDebugMode()
 
         val responseWrapper = wrap(response)
+        filterChain.doFilter(request, responseWrapper)
+
         try {
-            filterChain.doFilter(request, responseWrapper)
-            addDebugRecord(responseWrapper, debugService)
+            debugService.createRequestDebugRecord()?.let {
+                editor.put(responseWrapper, "_debug", it)
+            }
         } finally {
             responseWrapper.copyBodyToResponse()
         }
-    }
-
-    private fun addDebugRecord(
-            responseWrapper: ContentCachingResponseWrapper,
-            debugService: DebugService) {
-        val mapper = ObjectMapper()
-        val inStream = responseWrapper.contentInputStream
-        val map = try {
-            mapper.readValue<LinkedHashMap<String, Any?>>(inStream)
-        } catch (ignored: JsonMappingException) {
-            return
-        }
-        debugService.createRequestDebugRecord()?.let {
-            map["_debug"] = it
-        }
-
-        responseWrapper.reset()
-        mapper.writeValue(responseWrapper.outputStream, map)
     }
 }
 
