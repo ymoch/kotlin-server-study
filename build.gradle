@@ -49,13 +49,17 @@ jacocoTestReport {
 jacocoTestCoverageVerification {
     dependsOn 'test'
 
+    afterEvaluate {
+        classDirectories = fileTree(
+                dir: 'build/classes/kotlin/main/com/ymoch/study/server',
+                excludes: ['Application*.class'],
+        )
+    }
+
     violationRules {
         rule {
-            excludes = [
-                    'com.ymoch.study.server.ApplicationKt',
-            ]
             limit {
-                minimum = 0.85
+                minimum = 0.90
             }
         }
     }
