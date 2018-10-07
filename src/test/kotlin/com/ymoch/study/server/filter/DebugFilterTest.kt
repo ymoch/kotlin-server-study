@@ -45,11 +45,6 @@ internal class DebugFilterTest {
         filter = DebugFilter(context, conversionService)
 
         `when`(context.getBean(DebugService::class.java)).thenReturn(debugService)
-        `when`(conversionService.convert(null, Boolean::class.java)).thenReturn(null)
-        `when`(conversionService.convert("on", Boolean::class.java)).thenReturn(true)
-        `when`(conversionService.convert("off", Boolean::class.java)).thenReturn(false)
-        `when`(conversionService.convert("invalid", Boolean::class.java))
-                .thenThrow(mock(ConversionException::class.java))
     }
 
     @Nested
@@ -69,29 +64,46 @@ internal class DebugFilterTest {
         @BeforeEach
         fun setUp() {
             `when`(debugService.debugModeEnabled()).thenReturn(true)
+            `when`(conversionService.convert("on", Boolean::class.java)).thenReturn(true)
         }
 
         @Nested
         inner class WhenNotGivenDebugParameter {
             @Test
-            fun thenRunsDefaultFilterChain() =
-                    testRunsDefaultFilterChain(null)
+            fun thenRunsDefaultFilterChain() {
+                `when`(conversionService.convert(null, Boolean::class.java))
+                        .thenReturn(null)
+                testRunsDefaultFilterChain(null)
+            }
         }
 
         @Nested
         inner class WhenGivenNotDebuggingParameter {
             @Test
-            fun thenRunsDefaultFilterChain() =
-                    testRunsDefaultFilterChain("off")
+            fun thenRunsDefaultFilterChain() {
+                `when`(conversionService.convert("off", Boolean::class.java))
+                        .thenReturn(false)
+                testRunsDefaultFilterChain("off")
+            }
         }
 
         @Nested
         inner class WhenGivenInvalidDebuggingParameter {
             @Test
-            fun thenRunsDefaultFilterChain() =
-                    testRunsDefaultFilterChain("invalid")
+            fun thenRunsDefaultFilterChain() {
+                `when`(conversionService.convert("invalid", Boolean::class.java))
+                        .thenThrow(mock(ConversionException::class.java))
+                testRunsDefaultFilterChain("invalid")
+            }
         }
 
+        @Nested
+        inner class WhenGivenDebuggingParameter {
+            @BeforeEach
+            fun setUp() {
+                `when`(conversionService.convert("on", Boolean::class.java)).thenReturn(true)
+            }
+        }
     }
 
     private fun testRunsDefaultFilterChain(debugParam: String?) {

@@ -16,22 +16,21 @@ import javax.servlet.ServletRequest
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-val DEFAULT_RESPONSE_WRAPPER_CREATOR = { response: HttpServletResponse ->
-    ContentCachingResponseWrapper(response)
-}
+fun wrapDefaultly(response: HttpServletResponse) =
+        ContentCachingResponseWrapper(response)
 
 @Component
 class DebugFilter(
         private val context: ApplicationContext,
         private val conversionService: ConversionService,
-        private val responseWrapperCreator: (HttpServletResponse) -> ContentCachingResponseWrapper
+        private val wrap: (HttpServletResponse) -> ContentCachingResponseWrapper
 ) : OncePerRequestFilter() {
 
     @Autowired
     constructor(
             context: ApplicationContext,
             conversionService: ConversionService
-    ) : this(context, conversionService, DEFAULT_RESPONSE_WRAPPER_CREATOR)
+    ) : this(context, conversionService, ::wrapDefaultly)
 
     override fun doFilterInternal(
             request: HttpServletRequest,
@@ -48,7 +47,7 @@ class DebugFilter(
         }
         debugService.enableRequestDebugMode()
 
-        val responseWrapper = responseWrapperCreator(response)
+        val responseWrapper = wrap(response)
         try {
             filterChain.doFilter(request, responseWrapper)
             addDebugRecord(responseWrapper, debugService)
