@@ -8,21 +8,25 @@ import org.springframework.stereotype.Component
 import org.springframework.web.util.ContentCachingResponseWrapper
 
 @Component
-class JsonResponseEditorImpl : JsonResponseEditor {
+class JsonResponseEditorImpl(
+        private val objectMapper: ObjectMapper
+) : JsonResponseEditor {
 
-    override fun put(
+    override fun putFields(
             responseWrapper: ContentCachingResponseWrapper,
-            key: String, value: Any?) {
-        val mapper = ObjectMapper()
+            map: Map<String, Any?>) {
         val inStream = responseWrapper.contentInputStream
         val jsonObject = try {
-            mapper.readValue<LinkedHashMap<String, Any?>>(inStream)
+            objectMapper.readValue<LinkedHashMap<String, Any?>>(inStream)
         } catch (ignored: JsonMappingException) {
             return
         }
 
-        jsonObject[key] = value
+        map.entries.forEach {
+            jsonObject[it.key] = it.value
+        }
+
         responseWrapper.reset()
-        mapper.writeValue(responseWrapper.writer, jsonObject)
+        objectMapper.writeValue(responseWrapper.writer, jsonObject)
     }
 }

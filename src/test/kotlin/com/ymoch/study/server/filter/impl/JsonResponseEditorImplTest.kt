@@ -1,5 +1,6 @@
 package com.ymoch.study.server.filter.impl
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach
@@ -27,9 +28,11 @@ internal class JsonResponseEditorImplTest {
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.initMocks(this)
+
         writer = StringWriter()
-        editor = JsonResponseEditorImpl()
         `when`(responseWrapper.writer).thenReturn(PrintWriter(writer))
+
+        editor = JsonResponseEditorImpl(ObjectMapper())
     }
 
     @Nested
@@ -44,7 +47,7 @@ internal class JsonResponseEditorImplTest {
 
         @Test
         fun thenDoNothing() {
-            editor.put(responseWrapper, "key", "value")
+            editor.putFields(responseWrapper, mapOf("key" to "value"))
             verify(responseWrapper, never()).writer
         }
     }
@@ -61,7 +64,7 @@ internal class JsonResponseEditorImplTest {
 
         @Test
         fun thenAddsItem() {
-            editor.put(responseWrapper, "key", "value")
+            editor.putFields(responseWrapper, mapOf("key" to "value"))
             assertThat(writer.toString(),
                     equalTo("{\"foo\":\"bar\",\"key\":\"value\"}"))
         }

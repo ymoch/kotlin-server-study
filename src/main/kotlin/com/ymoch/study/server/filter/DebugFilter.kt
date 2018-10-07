@@ -13,9 +13,6 @@ import javax.servlet.ServletRequest
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-fun wrapDefaultly(response: HttpServletResponse) =
-        ContentCachingResponseWrapper(response)
-
 @Component
 class DebugFilter(
         private val context: ApplicationContext,
@@ -51,13 +48,16 @@ class DebugFilter(
 
         try {
             debugService.createRequestDebugRecord()?.let {
-                editor.put(responseWrapper, "_debug", it)
+                editor.putField(responseWrapper, "_debug", it)
             }
         } finally {
             responseWrapper.copyBodyToResponse()
         }
     }
 }
+
+fun wrapDefaultly(response: HttpServletResponse) =
+        ContentCachingResponseWrapper(response)
 
 fun isDebugParameterEnabled(
         request: ServletRequest,
