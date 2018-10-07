@@ -9,11 +9,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
+import org.springframework.context.ApplicationContext
 import javax.servlet.http.HttpServletResponse
 
 internal class ErrorHandlingControllerTest {
+
+    @Mock
+    private lateinit var context: ApplicationContext
 
     @Mock
     private lateinit var errorService: ErrorService
@@ -29,8 +34,8 @@ internal class ErrorHandlingControllerTest {
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        controller = ErrorHandlingController(errorService)
-        controller.setDebugService(debugService)
+        `when`(context.getBean(DebugService::class.java)).thenReturn(debugService)
+        controller = ErrorHandlingController(context, errorService)
     }
 
     @Test
@@ -44,7 +49,8 @@ internal class ErrorHandlingControllerTest {
         assertThat(record.error, equalTo("error"))
         assertThat(record.message, equalTo("message"))
 
-        verify(debugService).registerException(exception)
-        verify(response).status = 403
+        verify(context, times(1)).getBean(DebugService::class.java)
+        verify(debugService, times(1)).registerException(exception)
+        verify(response, times(1)).status = 403
     }
 }
