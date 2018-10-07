@@ -47,7 +47,7 @@ internal class JsonResponseEditorImplTest {
 
         @Test
         fun thenDoNothing() {
-            editor.putFields(responseWrapper, mapOf("key" to "value"))
+            editor.putField(responseWrapper, "key", "value")
             verify(responseWrapper, never()).writer
         }
     }
@@ -63,7 +63,14 @@ internal class JsonResponseEditorImplTest {
         }
 
         @Test
-        fun thenAddsItem() {
+        fun thenAddAnItem() {
+            editor.putField(responseWrapper, "key", "value")
+            assertThat(writer.toString(),
+                    equalTo("{\"foo\":\"bar\",\"key\":\"value\"}"))
+        }
+
+        @Test
+        fun thenAddsItems() {
             editor.putFields(responseWrapper, mapOf("key" to "value"))
             assertThat(writer.toString(),
                     equalTo("{\"foo\":\"bar\",\"key\":\"value\"}"))
