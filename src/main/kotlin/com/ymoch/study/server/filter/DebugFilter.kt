@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.ymoch.study.server.service.DebugService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
 import org.springframework.core.convert.ConversionException
 import org.springframework.core.convert.ConversionService
 import org.springframework.stereotype.Component
@@ -21,51 +22,46 @@ val DEFAULT_RESPONSE_WRAPPER_CREATOR = { response: HttpServletResponse ->
 
 @Component
 class DebugFilter(
+        private val context: ApplicationContext,
         private val conversionService: ConversionService,
         private val responseWrapperCreator: (HttpServletResponse) -> ContentCachingResponseWrapper
 ) : OncePerRequestFilter() {
 
     @Autowired
-    constructor(conversionService: ConversionService)
-            : this(conversionService, DEFAULT_RESPONSE_WRAPPER_CREATOR)
-
-    // Since this service's scope is request.
-    private lateinit var debugService: DebugService
-
-    @Autowired
-    fun setDebugService(debugService: DebugService) {
-        this.debugService = debugService
-    }
+    constructor(
+            context: ApplicationContext,
+            conversionService: ConversionService
+    ) : this(context, conversionService, DEFAULT_RESPONSE_WRAPPER_CREATOR)
 
     override fun doFilterInternal(
             request: HttpServletRequest,
             response: HttpServletResponse,
             filterChain: FilterChain) {
+        // Debug service is request-scoped.
+        val debugService = context.getBean(DebugService::class.java)
+
         val isDebugRequest = debugService.debugModeEnabled() &&
                 isDebugParameterEnabled(request, conversionService)
         if (!isDebugRequest) {
             filterChain.doFilter(request, response)
             return
         }
-
         debugService.enableRequestDebugMode()
 
-        val wrappedResponse = responseWrapperCreator(response)
+        val responseWrapper = responseWrapperCreator(response)
         try {
-            doFilterForWrappedResponse(request, wrappedResponse, filterChain)
+            filterChain.doFilter(request, responseWrapper)
+            addDebugRecord(responseWrapper, debugService)
         } finally {
-            wrappedResponse.copyBodyToResponse()
+            responseWrapper.copyBodyToResponse()
         }
     }
 
-    private fun doFilterForWrappedResponse(
-            request: HttpServletRequest,
-            wrappedResponse: ContentCachingResponseWrapper,
-            filterChain: FilterChain) {
-        filterChain.doFilter(request, wrappedResponse)
-
+    private fun addDebugRecord(
+            responseWrapper: ContentCachingResponseWrapper,
+            debugService: DebugService) {
         val mapper = ObjectMapper()
-        val inStream = wrappedResponse.contentInputStream
+        val inStream = responseWrapper.contentInputStream
         val map = try {
             mapper.readValue<LinkedHashMap<String, Any?>>(inStream)
         } catch (ignored: JsonMappingException) {
@@ -74,8 +70,9 @@ class DebugFilter(
         debugService.createRequestDebugRecord()?.let {
             map["_debug"] = it
         }
-        wrappedResponse.reset()
-        mapper.writeValue(wrappedResponse.outputStream, map)
+
+        responseWrapper.reset()
+        mapper.writeValue(responseWrapper.outputStream, map)
     }
 }
 

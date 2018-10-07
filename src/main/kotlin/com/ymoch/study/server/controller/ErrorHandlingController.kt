@@ -20,6 +20,7 @@ class ErrorHandlingController(
             exception: Exception,
             response: HttpServletResponse
     ): ErrorRecord {
+        // Debug service is request-scoped.
         val debugService = context.getBean(DebugService::class.java)
         debugService.registerException(exception)
 

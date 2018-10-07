@@ -10,6 +10,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
+import org.springframework.context.ApplicationContext
 import org.springframework.core.convert.ConversionException
 import org.springframework.core.convert.ConversionService
 import javax.servlet.FilterChain
@@ -17,6 +18,9 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 internal class DebugFilterTest {
+
+    @Mock
+    private lateinit var context: ApplicationContext
 
     @Mock
     private lateinit var conversionService: ConversionService
@@ -38,9 +42,9 @@ internal class DebugFilterTest {
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        filter = DebugFilter(conversionService)
-        filter.setDebugService(debugService)
+        filter = DebugFilter(context, conversionService)
 
+        `when`(context.getBean(DebugService::class.java)).thenReturn(debugService)
         `when`(conversionService.convert(null, Boolean::class.java)).thenReturn(null)
         `when`(conversionService.convert("on", Boolean::class.java)).thenReturn(true)
         `when`(conversionService.convert("off", Boolean::class.java)).thenReturn(false)
