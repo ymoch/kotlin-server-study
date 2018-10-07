@@ -23,6 +23,6 @@ class JsonResponseEditorImpl : JsonResponseEditor {
 
         jsonObject[key] = value
         responseWrapper.reset()
-        mapper.writeValue(responseWrapper.outputStream, jsonObject)
+        mapper.writeValue(responseWrapper.writer, jsonObject)
     }
 }
