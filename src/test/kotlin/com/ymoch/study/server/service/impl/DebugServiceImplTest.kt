@@ -3,6 +3,7 @@ package com.ymoch.study.server.service.impl
 import com.ymoch.study.server.record.debug.DebugRecord
 import com.ymoch.study.server.service.debug.DebugService
 import com.ymoch.study.server.service.debug.JsonResponseEditor
+import com.ymoch.study.server.service.debug.ResponseWrapperFactory
 import com.ymoch.study.server.service.debug.impl.DebugServiceImpl
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -29,11 +30,16 @@ internal class DebugServiceImplTest {
     @Mock
     private lateinit var jsonResponseEditor: JsonResponseEditor
 
+    @Mock
+    private lateinit var responseWrapperFactory: ResponseWrapperFactory
+
     private lateinit var service: DebugService
 
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.initMocks(this)
+        service = DebugServiceImpl(
+                conversionService, jsonResponseEditor, responseWrapperFactory)
     }
 
     @Nested
@@ -45,10 +51,6 @@ internal class DebugServiceImplTest {
         @BeforeEach
         fun setUp() {
             MockitoAnnotations.initMocks(this)
-
-            // Use the secondary constructor
-            // because the response wrap function is not used in this case.
-            service = DebugServiceImpl(conversionService, jsonResponseEditor)
 
             `when`(conversionService.convert(null, Boolean::class.java))
                     .thenReturn(null)
@@ -106,10 +108,6 @@ internal class DebugServiceImplTest {
     inner class WhenDebugging {
 
         @Mock
-        private lateinit var wrap:
-                (HttpServletResponse) -> ContentCachingResponseWrapper
-
-        @Mock
         private lateinit var response: HttpServletResponse
 
         @Mock
@@ -119,10 +117,8 @@ internal class DebugServiceImplTest {
         fun setUp() {
             MockitoAnnotations.initMocks(this)
 
-            service = DebugServiceImpl(
-                    conversionService, jsonResponseEditor, wrap)
-
-            `when`(wrap(response)).thenReturn(wrappedResponse)
+            `when`(responseWrapperFactory.wrap(response))
+                    .thenReturn(wrappedResponse)
         }
 
         @Test
@@ -138,13 +134,5 @@ internal class DebugServiceImplTest {
             verify(jsonResponseEditor, times(1))
                     .putField(wrappedResponse, "_debug", record)
         }
-    }
-
-    @Test
-    fun wrapDefaultWrapsResponse() {
-        val response = mock(HttpServletResponse::class.java)
-        val wrappedResponse = DebugServiceImpl.wrapDefault(response)
-        val innerResponse = wrappedResponse.response
-        assertThat(innerResponse as HttpServletResponse, equalTo(response))
     }
 }

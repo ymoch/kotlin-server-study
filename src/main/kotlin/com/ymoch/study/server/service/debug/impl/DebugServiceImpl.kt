@@ -3,13 +3,12 @@ package com.ymoch.study.server.service.debug.impl
 import com.ymoch.study.server.service.debug.DebugRecorder
 import com.ymoch.study.server.service.debug.DebugService
 import com.ymoch.study.server.service.debug.JsonResponseEditor
-import org.springframework.beans.factory.annotation.Autowired
+import com.ymoch.study.server.service.debug.ResponseWrapperFactory
 import org.springframework.context.annotation.Scope
 import org.springframework.core.convert.ConversionException
 import org.springframework.core.convert.ConversionService
 import org.springframework.stereotype.Service
 import org.springframework.web.context.WebApplicationContext
-import org.springframework.web.util.ContentCachingResponseWrapper
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -18,23 +17,8 @@ import javax.servlet.http.HttpServletResponse
 class DebugServiceImpl(
         private val conversionService: ConversionService,
         private val jsonResponseEditor: JsonResponseEditor,
-        private val wrap: (HttpServletResponse) -> ContentCachingResponseWrapper
+        private val responseWrapperFactory: ResponseWrapperFactory
 ) : DebugService {
-
-    @Autowired
-    constructor(
-            conversionService: ConversionService,
-            jsonResponseEditor: JsonResponseEditor
-    ) : this(
-            conversionService,
-            jsonResponseEditor,
-            Companion::wrapDefault
-    )
-
-    companion object {
-        fun wrapDefault(response: HttpServletResponse) =
-                ContentCachingResponseWrapper(response)
-    }
 
     // When request debug mode is on, then recorder is not null.
     // When request debug mode is off, then recorder is null.
@@ -52,7 +36,7 @@ class DebugServiceImpl(
     override fun debugRun(
             response: HttpServletResponse,
             run: (HttpServletResponse) -> Unit) {
-        val responseWrapper = wrap(response)
+        val responseWrapper = responseWrapperFactory.wrap(response)
 
         val currentRecorder = DebugRecorder()
 
