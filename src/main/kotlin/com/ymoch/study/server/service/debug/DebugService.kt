@@ -5,8 +5,6 @@ import javax.servlet.http.HttpServletResponse
 
 interface DebugService {
 
-    fun debugModeEnabled(): Boolean
-
     fun isDebugRequest(request: HttpServletRequest): Boolean
 
     fun debugRun(

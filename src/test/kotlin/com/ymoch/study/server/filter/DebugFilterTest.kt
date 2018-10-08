@@ -50,11 +50,11 @@ internal class DebugFilterTest {
     }
 
     @Nested
-    inner class WhenDebugModeIsNotEnabled {
+    inner class WhenGivenNotDebugRequest {
 
         @BeforeEach
         fun setUp() {
-            `when`(debugService.debugModeEnabled()).thenReturn(false)
+            `when`(debugService.isDebugRequest(request)).thenReturn(false)
         }
 
         @Test
@@ -62,38 +62,17 @@ internal class DebugFilterTest {
     }
 
     @Nested
-    inner class WhenDebugModeIsEnabled {
-
+    inner class WhenGivenDebugRequest {
         @BeforeEach
         fun setUp() {
-            `when`(debugService.debugModeEnabled()).thenReturn(true)
+            `when`(debugService.isDebugRequest(request)).thenReturn(true)
         }
 
-        @Nested
-        inner class WhenGivenNotDebugRequest {
-
-            @BeforeEach
-            fun setUp() {
-                `when`(debugService.isDebugRequest(request)).thenReturn(false)
-            }
-
-            @Test
-            fun thenRunsDefaultFilterChain() = testRunsDefaultFilterChain()
-        }
-
-        @Nested
-        inner class WhenGivenDebugRequest {
-            @BeforeEach
-            fun setUp() {
-                `when`(debugService.isDebugRequest(request)).thenReturn(true)
-            }
-
-            @Test
-            fun thenRunsDebug() {
-                filter.doFilter(request, response, filterChain)
-                verify(filterChain, times(1)).doFilter(request, response)
-                verify(response).setHeader("debugging", "on")
-            }
+        @Test
+        fun thenRunsDebug() {
+            filter.doFilter(request, response, filterChain)
+            verify(filterChain, times(1)).doFilter(request, response)
+            verify(response).setHeader("debugging", "on")
         }
     }
 

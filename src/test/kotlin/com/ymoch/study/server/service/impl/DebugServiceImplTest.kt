@@ -48,7 +48,7 @@ internal class DebugServiceImplTest {
 
             // Use the secondary constructor
             // because the response wrap function is not used in this case.
-            service = DebugServiceImpl(conversionService, jsonResponseEditor, false)
+            service = DebugServiceImpl(conversionService, jsonResponseEditor)
 
             `when`(conversionService.convert(null, Boolean::class.java))
                     .thenReturn(null)
@@ -103,38 +103,6 @@ internal class DebugServiceImplTest {
     }
 
     @Nested
-    inner class WhenDebuggingPropertyIsFalse {
-
-        @BeforeEach
-        fun setUp() {
-            // Use the secondary constructor
-            // because the response wrap function is not used in this case.
-            service = DebugServiceImpl(conversionService, jsonResponseEditor, false)
-        }
-
-        @Test
-        fun thenDebugModeIsNotEnabled() {
-            assertThat(service.debugModeEnabled(), equalTo(false))
-        }
-    }
-
-    @Nested
-    inner class WhenDebuggingPropertyIsTrue {
-
-        @BeforeEach
-        fun setUp() {
-            // Use the secondary constructor
-            // because the response wrap function is not used in this case.
-            service = DebugServiceImpl(conversionService, jsonResponseEditor, true)
-        }
-
-        @Test
-        fun thenDebugModeIsEnabled() {
-            assertThat(service.debugModeEnabled(), equalTo(true))
-        }
-    }
-
-    @Nested
     inner class WhenDebugging {
 
         @Mock
@@ -152,7 +120,7 @@ internal class DebugServiceImplTest {
             MockitoAnnotations.initMocks(this)
 
             service = DebugServiceImpl(
-                    conversionService, jsonResponseEditor, true, wrap)
+                    conversionService, jsonResponseEditor, wrap)
 
             `when`(wrap(response)).thenReturn(wrappedResponse)
         }
