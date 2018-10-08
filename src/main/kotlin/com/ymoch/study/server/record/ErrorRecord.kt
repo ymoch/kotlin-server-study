@@ -2,7 +2,7 @@ package com.ymoch.study.server.record
 
 import org.springframework.http.HttpStatus
 
-class ErrorRecord(
+data class ErrorRecord(
         val status: Int,
         val error: String,
         val message: String?) {

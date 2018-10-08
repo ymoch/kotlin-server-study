@@ -52,7 +52,10 @@ jacocoTestCoverageVerification {
     afterEvaluate {
         classDirectories = fileTree(
                 dir: 'build/classes/kotlin/main/com/ymoch/study/server',
-                excludes: ['Application*.class'],
+                excludes: [
+                        'Application*.class',
+                        'record/**'
+                ],
         )
     }
 
