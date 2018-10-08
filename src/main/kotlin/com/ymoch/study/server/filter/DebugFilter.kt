@@ -1,6 +1,6 @@
 package com.ymoch.study.server.filter
 
-import com.ymoch.study.server.service.DebugService
+import com.ymoch.study.server.service.debug.DebugService
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter

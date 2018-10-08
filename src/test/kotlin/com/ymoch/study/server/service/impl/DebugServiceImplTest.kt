@@ -3,7 +3,8 @@ package com.ymoch.study.server.service.impl
 import com.ymoch.study.server.filter.JsonResponseEditor
 import com.ymoch.study.server.record.debug.DebugRecord
 import com.ymoch.study.server.record.debug.ExceptionRecord
-import com.ymoch.study.server.service.DebugService
+import com.ymoch.study.server.service.debug.DebugService
+import com.ymoch.study.server.service.debug.impl.DebugServiceImpl
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
@@ -185,7 +186,7 @@ internal class DebugServiceImplTest {
                             StackTraceElement("declaringClass", "methodName", "fileName", 0),
                             StackTraceElement("declaringClass", "methodName", "fileName", 1)
                     ))
-                    service.registerException(exception)
+                    service.getDebugRecorder()?.registerException(exception)
                 }
 
                 @Test
@@ -211,7 +212,7 @@ internal class DebugServiceImplTest {
 
                 @Test
                 fun thenSetsExceptionClassName() {
-                    service.registerException(Exception())
+                    service.getDebugRecorder()?.registerException(Exception())
                     val record = service.createRequestDebugRecord()!!
                     val exceptionRecord = record.exception!!
                     assertThat(exceptionRecord.className, equalTo("java.lang.Exception"))

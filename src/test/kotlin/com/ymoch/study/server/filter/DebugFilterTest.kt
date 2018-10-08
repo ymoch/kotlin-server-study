@@ -1,7 +1,7 @@
 package com.ymoch.study.server.filter
 
 import com.ymoch.study.server.MockitoHelper.Companion.any
-import com.ymoch.study.server.service.DebugService
+import com.ymoch.study.server.service.debug.DebugService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

@@ -1,4 +1,4 @@
-package com.ymoch.study.server.service
+package com.ymoch.study.server.service.debug
 
 import com.ymoch.study.server.record.debug.DebugRecord
 import javax.servlet.http.HttpServletRequest
@@ -9,10 +9,11 @@ interface DebugService {
     fun debugModeEnabled(): Boolean
     fun isDebugRequest(request: HttpServletRequest): Boolean
     fun enableRequestDebugMode()
-    fun registerException(exception: Exception)
     fun createRequestDebugRecord(): DebugRecord?
 
     fun debugRun(
             response: HttpServletResponse,
             run: (HttpServletResponse) -> Unit)
+
+    fun getDebugRecorder(): DebugRecorder?
 }
