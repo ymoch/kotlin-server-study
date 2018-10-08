@@ -1,5 +1,8 @@
 package com.ymoch.study.server.configuration
 
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -35,13 +38,41 @@ internal class LoggerConfigurationTest {
         fun setUp() {
             MockitoAnnotations.initMocks(this)
             `when`(injectionPoint.methodParameter).thenReturn(methodParameter)
-            `when`(methodParameter.containingClass)
-                    .thenReturn(LoggerConfigurationTest::class.java)
         }
 
-        @Test
-        fun thenReturnsLogger() {
-            loggerConfiguration.logger(injectionPoint)
+        @Nested
+        inner class WhenMethodParameterContainsClass {
+
+            @BeforeEach
+            fun setUp() {
+                `when`(methodParameter.containingClass)
+                        .thenReturn(LoggerConfigurationTest::class.java)
+            }
+
+            @Test
+            fun thenReturnsLogger() = testCreatesLogger()
+        }
+
+        @Nested
+        inner class WhenMethodParameterContainsNoClass {
+
+            @BeforeEach
+            fun setUp() {
+                `when`(methodParameter.containingClass).thenReturn(null)
+            }
+
+
+            @Nested
+            inner class WhenInjectionPointHasNoField {
+
+                @BeforeEach
+                fun setUp() {
+                    `when`(injectionPoint.field).thenReturn(null)
+                }
+
+                @Test
+                fun thenThrowException() = testThrowsException()
+            }
         }
     }
 
@@ -66,9 +97,7 @@ internal class LoggerConfigurationTest {
             }
 
             @Test
-            fun thenReturnsLogger() {
-                loggerConfiguration.logger(injectionPoint)
-            }
+            fun thenReturnsLogger() = testCreatesLogger()
         }
 
         @Nested
@@ -80,11 +109,17 @@ internal class LoggerConfigurationTest {
             }
 
             @Test
-            fun thenThrowException() {
-                assertThrows(BeanCreationException::class.java) {
-                    loggerConfiguration.logger(injectionPoint)
-                }
-            }
+            fun thenThrowException() = testThrowsException()
+        }
+    }
+
+    fun testCreatesLogger() {
+        loggerConfiguration.logger(injectionPoint)
+    }
+
+    fun testThrowsException() {
+        assertThrows(BeanCreationException::class.java) {
+            loggerConfiguration.logger(injectionPoint)
         }
     }
 }
