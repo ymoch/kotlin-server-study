@@ -1,6 +1,6 @@
 package com.ymoch.study.server.record.debug
 
-class ExceptionRecord(
+data class ExceptionRecord(
         val className: String,
         val stackTrace: List<String>
 )

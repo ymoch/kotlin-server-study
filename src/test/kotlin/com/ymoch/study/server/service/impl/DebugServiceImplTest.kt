@@ -1,9 +1,9 @@
 package com.ymoch.study.server.service.impl
 
-import com.ymoch.study.server.service.debug.JsonResponseEditor
 import com.ymoch.study.server.record.debug.DebugRecord
 import com.ymoch.study.server.record.debug.ExceptionRecord
 import com.ymoch.study.server.service.debug.DebugService
+import com.ymoch.study.server.service.debug.JsonResponseEditor
 import com.ymoch.study.server.service.debug.impl.DebugServiceImpl
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations
 import org.springframework.core.convert.ConversionException
 import org.springframework.core.convert.ConversionService
 import org.springframework.web.util.ContentCachingResponseWrapper
+import sun.security.ssl.Debug
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -242,6 +243,20 @@ internal class DebugServiceImplTest {
                     conversionService, jsonResponseEditor, true, wrap)
 
             `when`(wrap(response)).thenReturn(wrappedResponse)
+        }
+
+        @Test
+        fun test() {
+            var record: DebugRecord? = null
+            service.debugRun(response) {
+                val recorder = service.getDebugRecorder()!!
+                recorder.registerException(Exception("message"))
+                record = recorder.toDebugRecord()
+            }
+
+            verify(wrappedResponse, times(1)).copyBodyToResponse()
+            verify(jsonResponseEditor, times(1))
+                    .putField(wrappedResponse, "_debug", record)
         }
     }
 

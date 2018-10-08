@@ -68,17 +68,17 @@ class DebugServiceImpl(
             run: (HttpServletResponse) -> Unit) {
         val responseWrapper = wrap(response)
 
-        recorder = DebugRecorder()
+        val currentRecorder = DebugRecorder()
+        recorder = currentRecorder
+
         val record = try {
             run(responseWrapper)
-            recorder?.toDebugRecord()
+            currentRecorder.toDebugRecord()
         } finally {
             recorder = null
         }
 
-        record?.let {
-            jsonResponseEditor.putField(responseWrapper, "_debug", record)
-        }
+        jsonResponseEditor.putField(responseWrapper, "_debug", record)
         responseWrapper.copyBodyToResponse()
     }
 

@@ -1,5 +1,5 @@
 package com.ymoch.study.server.record.debug
 
-class DebugRecord(
+data class DebugRecord(
         val exception: ExceptionRecord?
 )
