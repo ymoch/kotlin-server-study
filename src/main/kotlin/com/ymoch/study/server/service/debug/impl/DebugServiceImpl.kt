@@ -69,8 +69,8 @@ class DebugServiceImpl(
         val responseWrapper = wrap(response)
 
         val currentRecorder = DebugRecorder()
-        recorder = currentRecorder
 
+        recorder = currentRecorder
         val record = try {
             run(responseWrapper)
             currentRecorder.toDebugRecord()
