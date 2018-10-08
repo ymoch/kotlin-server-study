@@ -32,7 +32,7 @@ class DebugRecorder {
             val stackTrace = Arrays.stream(it.stackTrace)
                     .map { toStackTraceLine(it) }
                     .collect(Collectors.toList())
-            ExceptionRecord(className, stackTrace)
+            ExceptionRecord(className, it.message, stackTrace)
         }
         return DebugRecord(exception = exceptionRecord)
     }
