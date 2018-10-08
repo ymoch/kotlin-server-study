@@ -1,4 +1,4 @@
-package com.ymoch.study.server.filter
+package com.ymoch.study.server.service
 
 import org.springframework.web.util.ContentCachingResponseWrapper
 

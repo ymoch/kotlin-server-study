@@ -1,9 +1,9 @@
-package com.ymoch.study.server.filter.impl
+package com.ymoch.study.server.service.impl
 
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.ymoch.study.server.filter.JsonResponseEditor
+import com.ymoch.study.server.service.JsonResponseEditor
 import org.springframework.stereotype.Component
 import org.springframework.web.util.ContentCachingResponseWrapper
 
