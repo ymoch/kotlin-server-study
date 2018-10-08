@@ -14,9 +14,20 @@ class LoggerConfiguration {
     @Bean
     @Scope("prototype")
     fun logger(injectionPoint: InjectionPoint): Logger {
-        val clazz = injectionPoint.methodParameter?.containingClass
-                ?: injectionPoint.field?.declaringClass
-                ?: throw BeanCreationException("Cannot find type for Logger.")
-        return LoggerFactory.getLogger(clazz)
+        return LoggerFactory.getLogger(decideClass(injectionPoint))
+    }
+
+    private fun decideClass(injectionPoint: InjectionPoint): Class<*> {
+        val methodParameter = injectionPoint.methodParameter
+        if (methodParameter != null) {
+            return methodParameter.containingClass
+        }
+
+        val field = injectionPoint.field
+        if (field != null) {
+            return field.declaringClass
+        }
+
+        throw BeanCreationException("Cannot find type for Logger.")
     }
 }
