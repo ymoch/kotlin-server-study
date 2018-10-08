@@ -1,9 +1,8 @@
 package com.ymoch.study.server.service.debug.impl
 
-import com.ymoch.study.server.service.debug.JsonResponseEditor
-import com.ymoch.study.server.record.debug.DebugRecord
 import com.ymoch.study.server.service.debug.DebugRecorder
 import com.ymoch.study.server.service.debug.DebugService
+import com.ymoch.study.server.service.debug.JsonResponseEditor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Scope
@@ -30,7 +29,12 @@ class DebugServiceImpl(
             conversionService: ConversionService,
             jsonResponseEditor: JsonResponseEditor,
             @Value("\${debugging:false}") debugMode: Boolean
-    ) : this(conversionService, jsonResponseEditor, debugMode, Companion::wrapDefault)
+    ) : this(
+            conversionService,
+            jsonResponseEditor,
+            debugMode,
+            Companion::wrapDefault
+    )
 
     companion object {
         fun wrapDefault(response: HttpServletResponse) =
@@ -50,17 +54,6 @@ class DebugServiceImpl(
         } catch (ignored: ConversionException) {
             false
         }
-    }
-
-    override fun enableRequestDebugMode() {
-        if (!debugMode) {
-            return
-        }
-        recorder = DebugRecorder()
-    }
-
-    override fun createRequestDebugRecord(): DebugRecord? {
-        return recorder?.toDebugRecord()
     }
 
     override fun debugRun(
