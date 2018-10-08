@@ -1,6 +1,6 @@
 package com.ymoch.study.server.service.impl
 
-import com.ymoch.study.server.service.JsonResponseEditor
+import com.ymoch.study.server.service.debug.JsonResponseEditor
 import com.ymoch.study.server.record.debug.DebugRecord
 import com.ymoch.study.server.record.debug.ExceptionRecord
 import com.ymoch.study.server.service.debug.DebugService
@@ -243,6 +243,13 @@ internal class DebugServiceImplTest {
 
             `when`(wrap(response)).thenReturn(wrappedResponse)
         }
+    }
 
+    @Test
+    fun wrapDefaultWrapsResponse() {
+        val response = mock(HttpServletResponse::class.java)
+        val wrappedResponse = DebugServiceImpl.wrapDefault(response)
+        val innerResponse = wrappedResponse.response
+        assertThat(innerResponse as HttpServletResponse, equalTo(response))
     }
 }

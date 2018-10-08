@@ -1,6 +1,6 @@
 package com.ymoch.study.server.service.debug.impl
 
-import com.ymoch.study.server.service.JsonResponseEditor
+import com.ymoch.study.server.service.debug.JsonResponseEditor
 import com.ymoch.study.server.record.debug.DebugRecord
 import com.ymoch.study.server.service.debug.DebugRecorder
 import com.ymoch.study.server.service.debug.DebugService

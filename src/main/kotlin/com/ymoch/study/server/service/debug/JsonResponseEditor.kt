@@ -1,4 +1,4 @@
-package com.ymoch.study.server.service
+package com.ymoch.study.server.service.debug
 
 import org.springframework.web.util.ContentCachingResponseWrapper
 
