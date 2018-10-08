@@ -6,15 +6,19 @@ import com.ymoch.study.server.service.DebugService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Scope
 import org.springframework.context.annotation.ScopedProxyMode
+import org.springframework.core.convert.ConversionException
+import org.springframework.core.convert.ConversionService
 import org.springframework.stereotype.Service
 import org.springframework.web.context.WebApplicationContext
 import java.util.Arrays
 import java.util.stream.Collectors
+import javax.servlet.http.HttpServletRequest
 import kotlin.reflect.jvm.jvmName
 
 @Service
 @Scope(WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 class DebugServiceImpl(
+        private val conversionService: ConversionService,
         @Value("\${debugging:false}") private val debugMode: Boolean
 ) : DebugService {
     // When request debug mode is on, then recorder is not null.
@@ -22,6 +26,15 @@ class DebugServiceImpl(
     var recorder: Recorder? = null
 
     override fun debugModeEnabled() = debugMode
+
+    override fun isDebugRequest(request: HttpServletRequest): Boolean {
+        val debugParameter = request.getParameter("_debug")
+        return try {
+            conversionService.convert(debugParameter, Boolean::class.java) ?: false
+        } catch (ignored: ConversionException) {
+            false
+        }
+    }
 
     override fun enableRequestDebugMode() {
         if (!debugMode) {

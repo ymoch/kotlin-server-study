@@ -6,13 +6,10 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.springframework.context.ApplicationContext
-import org.springframework.core.convert.ConversionException
-import org.springframework.core.convert.ConversionService
 import org.springframework.web.util.ContentCachingResponseWrapper
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
@@ -22,9 +19,6 @@ internal class DebugFilterTest {
 
     @Mock
     private lateinit var context: ApplicationContext
-
-    @Mock
-    private lateinit var conversionService: ConversionService
 
     @Mock
     private lateinit var jsonResponseEditor: JsonResponseEditor
@@ -56,12 +50,12 @@ internal class DebugFilterTest {
         fun setUp() {
             // Run the secondary constructor
             // because the wrap function will not be used in this case.
-            filter = DebugFilter(context, conversionService, jsonResponseEditor)
+            filter = DebugFilter(context, jsonResponseEditor)
             `when`(debugService.debugModeEnabled()).thenReturn(false)
         }
 
         @Test
-        fun thenRunsDefaultFilterChain() = testRunsDefaultFilterChain(null)
+        fun thenRunsDefaultFilterChain() = testRunsDefaultFilterChain()
     }
 
     @Nested
@@ -74,56 +68,32 @@ internal class DebugFilterTest {
         fun setUp() {
             MockitoAnnotations.initMocks(this)
 
-            filter = DebugFilter(context, conversionService, jsonResponseEditor, wrap)
+            filter = DebugFilter(context, jsonResponseEditor, wrap)
             `when`(debugService.debugModeEnabled()).thenReturn(true)
-            `when`(conversionService.convert("on", Boolean::class.java)).thenReturn(true)
         }
 
         @Nested
-        inner class WhenNotGivenDebugParameter {
-            @Test
-            fun thenRunsDefaultFilterChain() {
-                `when`(conversionService.convert(null, Boolean::class.java))
-                        .thenReturn(null)
-                testRunsDefaultFilterChain(null)
-            }
-        }
-
-        @Nested
-        inner class WhenGivenNotDebuggingParameter {
-            @Test
-            fun thenRunsDefaultFilterChain() {
-                `when`(conversionService.convert("off", Boolean::class.java))
-                        .thenReturn(false)
-                testRunsDefaultFilterChain("off")
-            }
-        }
-
-        @Nested
-        inner class WhenGivenInvalidDebuggingParameter {
-            @Test
-            fun thenRunsDefaultFilterChain() {
-                `when`(conversionService.convert("invalid", Boolean::class.java))
-                        .thenThrow(mock(ConversionException::class.java))
-                testRunsDefaultFilterChain("invalid")
-            }
-        }
-
-        @Nested
-        inner class WhenGivenDebuggingParameter {
-            private lateinit var wrappedResponse: ContentCachingResponseWrapper
+        inner class WhenGivenNotDebugRequest {
 
             @BeforeEach
             fun setUp() {
-                wrappedResponse = mock(ContentCachingResponseWrapper::class.java)
+                `when`(debugService.isDebugRequest(request)).thenReturn(false)
+            }
 
-                `when`(conversionService.convert("on", Boolean::class.java)).thenReturn(true)
+            @Test
+            fun thenRunsDefaultFilterChain() = testRunsDefaultFilterChain()
+        }
+
+        @Nested
+        inner class WhenGivenDebugRequest {
+            @BeforeEach
+            fun setUp() {
+                `when`(debugService.isDebugRequest(request)).thenReturn(true)
             }
         }
     }
 
-    private fun testRunsDefaultFilterChain(debugParam: String?) {
-        `when`(request.getParameter("_debug")).thenReturn(debugParam)
+    private fun testRunsDefaultFilterChain() {
         filter.doFilter(request, response, filterChain)
         verify(filterChain, times(1)).doFilter(request, response)
     }

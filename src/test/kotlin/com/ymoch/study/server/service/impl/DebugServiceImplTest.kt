@@ -9,19 +9,97 @@ import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
+import org.mockito.MockitoAnnotations
+import org.springframework.core.convert.ConversionException
+import org.springframework.core.convert.ConversionService
+import javax.servlet.http.HttpServletRequest
 
 internal class DebugServiceImplTest {
 
+    @Mock
+    private lateinit var conversionService: ConversionService
+
     private lateinit var service: DebugService
+
+    @BeforeEach
+    fun setUp() {
+        MockitoAnnotations.initMocks(this)
+    }
+
+    @Nested
+    inner class WhenGivenRequest {
+
+        @Mock
+        private lateinit var request: HttpServletRequest
+
+        @BeforeEach
+        fun setUp() {
+            MockitoAnnotations.initMocks(this)
+            service = DebugServiceImpl(conversionService, false)
+
+            `when`(conversionService.convert(null, Boolean::class.java))
+                    .thenReturn(null)
+            `when`(conversionService.convert("off", Boolean::class.java))
+                    .thenReturn(false)
+            `when`(conversionService.convert("on", Boolean::class.java))
+                    .thenReturn(false)
+            `when`(conversionService.convert("invalid", Boolean::class.java))
+                    .thenThrow(mock(ConversionException::class.java))
+        }
+
+        @Nested
+        inner class WhenGivenNoDebugParameter {
+            @Test
+            fun thenIsNotDebugRequest() {
+                testIsDebugRequest(null, false)
+            }
+        }
+
+        @Nested
+        inner class WhenGivenFalseDebugParameter {
+            @Test
+            fun thenIsNotDebugRequest() {
+                testIsDebugRequest("off", false)
+            }
+        }
+
+        @Nested
+        inner class WhenGivenTrueDebugParameter {
+            @Test
+            fun thenIsDebugRequest() {
+                testIsDebugRequest("on", false)
+            }
+        }
+
+        @Nested
+        inner class WhenGivenInvalidDebugParameter {
+            @Test
+            fun thenIsDebugRequest() {
+                testIsDebugRequest("invalid", false)
+            }
+        }
+
+        private fun testIsDebugRequest(parameter: String?, expected: Boolean) {
+            `when`(request.getParameter("_debug")).thenReturn(parameter)
+
+            val actual = service.isDebugRequest(request)
+            assertThat(actual, equalTo(expected))
+            verify(request, times(1)).getParameter("_debug")
+            verify(conversionService, times(1)).convert(parameter, Boolean::class.java)
+        }
+    }
 
     @Nested
     inner class WhenDebuggingPropertyIsFalse {
 
         @BeforeEach
         fun setUp() {
-            service = DebugServiceImpl(false)
+            service = DebugServiceImpl(conversionService, false)
         }
 
         @Test
@@ -43,7 +121,7 @@ internal class DebugServiceImplTest {
 
         @BeforeEach
         fun setUp() {
-            service = DebugServiceImpl(true)
+            service = DebugServiceImpl(conversionService, true)
         }
 
         @Test
