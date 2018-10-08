@@ -4,6 +4,7 @@ import com.ymoch.study.server.filter.JsonResponseEditor
 import com.ymoch.study.server.record.debug.DebugRecord
 import com.ymoch.study.server.record.debug.ExceptionRecord
 import com.ymoch.study.server.service.DebugService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Scope
 import org.springframework.context.annotation.ScopedProxyMode
@@ -23,8 +24,22 @@ import kotlin.reflect.jvm.jvmName
 class DebugServiceImpl(
         private val conversionService: ConversionService,
         private val jsonResponseEditor: JsonResponseEditor,
-        @Value("\${debugging:false}") private val debugMode: Boolean
+        private val debugMode: Boolean,
+        private val wrap: (HttpServletResponse) -> ContentCachingResponseWrapper
 ) : DebugService {
+
+    @Autowired
+    constructor(
+            conversionService: ConversionService,
+            jsonResponseEditor: JsonResponseEditor,
+            @Value("\${debugging:false}") debugMode: Boolean
+    ) : this(conversionService, jsonResponseEditor, debugMode, ::wrapDefault)
+
+    companion object {
+        fun wrapDefault(response: HttpServletResponse) =
+                ContentCachingResponseWrapper(response)
+    }
+
     // When request debug mode is on, then recorder is not null.
     // When request debug mode is off, then recorder is null.
     var recorder: Recorder? = null
@@ -52,20 +67,24 @@ class DebugServiceImpl(
     }
 
     override fun createRequestDebugRecord(): DebugRecord? {
-       return recorder?.toDebugRecord()
+        return recorder?.toDebugRecord()
     }
 
     override fun debugRun(
             response: HttpServletResponse,
-            run: (HttpServletResponse) -> Unit
-    ) {
-        enableRequestDebugMode()
+            run: (HttpServletResponse) -> Unit) {
+        val responseWrapper = wrap(response)
 
-        val responseWrapper = ContentCachingResponseWrapper(response)
-        run(responseWrapper)
+        recorder = Recorder()
+        val record = try {
+            run(responseWrapper)
+            recorder?.toDebugRecord()
+        } finally {
+            recorder = null
+        }
 
-        createRequestDebugRecord()?.let {
-            jsonResponseEditor.putField(responseWrapper, "_debug", it)
+        record?.let {
+            jsonResponseEditor.putField(responseWrapper, "_debug", record)
         }
         responseWrapper.copyBodyToResponse()
     }

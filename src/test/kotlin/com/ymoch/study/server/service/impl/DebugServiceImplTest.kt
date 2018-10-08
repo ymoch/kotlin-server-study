@@ -18,7 +18,9 @@ import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.springframework.core.convert.ConversionException
 import org.springframework.core.convert.ConversionService
+import org.springframework.web.util.ContentCachingResponseWrapper
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 internal class DebugServiceImplTest {
 
@@ -44,6 +46,9 @@ internal class DebugServiceImplTest {
         @BeforeEach
         fun setUp() {
             MockitoAnnotations.initMocks(this)
+
+            // Use the secondary constructor
+            // because the response wrap function is not used in this case.
             service = DebugServiceImpl(conversionService, jsonResponseEditor, false)
 
             `when`(conversionService.convert(null, Boolean::class.java))
@@ -103,6 +108,8 @@ internal class DebugServiceImplTest {
 
         @BeforeEach
         fun setUp() {
+            // Use the secondary constructor
+            // because the response wrap function is not used in this case.
             service = DebugServiceImpl(conversionService, jsonResponseEditor, false)
         }
 
@@ -125,6 +132,8 @@ internal class DebugServiceImplTest {
 
         @BeforeEach
         fun setUp() {
+            // Use the secondary constructor
+            // because the response wrap function is not used in this case.
             service = DebugServiceImpl(conversionService, jsonResponseEditor, true)
         }
 
@@ -209,5 +218,30 @@ internal class DebugServiceImplTest {
                 }
             }
         }
+    }
+
+    @Nested
+    inner class WhenDebugging {
+
+        @Mock
+        private lateinit var wrap:
+                (HttpServletResponse) -> ContentCachingResponseWrapper
+
+        @Mock
+        private lateinit var response: HttpServletResponse
+
+        @Mock
+        private lateinit var wrappedResponse: ContentCachingResponseWrapper
+
+        @BeforeEach
+        fun setUp() {
+            MockitoAnnotations.initMocks(this)
+
+            service = DebugServiceImpl(
+                    conversionService, jsonResponseEditor, true, wrap)
+
+            `when`(wrap(response)).thenReturn(wrappedResponse)
+        }
+
     }
 }
