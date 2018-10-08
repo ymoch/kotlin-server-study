@@ -21,9 +21,6 @@ internal class DebugFilterTest {
     private lateinit var context: ApplicationContext
 
     @Mock
-    private lateinit var jsonResponseEditor: JsonResponseEditor
-
-    @Mock
     private lateinit var debugService: DebugService
 
     @Mock
@@ -40,6 +37,8 @@ internal class DebugFilterTest {
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.initMocks(this)
+        filter = DebugFilter(context)
+
         `when`(context.getBean(DebugService::class.java)).thenReturn(debugService)
     }
 
@@ -48,9 +47,6 @@ internal class DebugFilterTest {
 
         @BeforeEach
         fun setUp() {
-            // Run the secondary constructor
-            // because the wrap function will not be used in this case.
-            filter = DebugFilter(context, jsonResponseEditor)
             `when`(debugService.debugModeEnabled()).thenReturn(false)
         }
 
@@ -61,14 +57,8 @@ internal class DebugFilterTest {
     @Nested
     inner class WhenDebugModeIsEnabled {
 
-        @Mock
-        private lateinit var wrap: (HttpServletResponse) -> ContentCachingResponseWrapper
-
         @BeforeEach
         fun setUp() {
-            MockitoAnnotations.initMocks(this)
-
-            filter = DebugFilter(context, jsonResponseEditor, wrap)
             `when`(debugService.debugModeEnabled()).thenReturn(true)
         }
 

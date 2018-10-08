@@ -1,5 +1,6 @@
 package com.ymoch.study.server.service.impl
 
+import com.ymoch.study.server.filter.JsonResponseEditor
 import com.ymoch.study.server.record.debug.DebugRecord
 import com.ymoch.study.server.record.debug.ExceptionRecord
 import com.ymoch.study.server.service.DebugService
@@ -10,15 +11,18 @@ import org.springframework.core.convert.ConversionException
 import org.springframework.core.convert.ConversionService
 import org.springframework.stereotype.Service
 import org.springframework.web.context.WebApplicationContext
+import org.springframework.web.util.ContentCachingResponseWrapper
 import java.util.Arrays
 import java.util.stream.Collectors
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 import kotlin.reflect.jvm.jvmName
 
 @Service
 @Scope(WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 class DebugServiceImpl(
         private val conversionService: ConversionService,
+        private val jsonResponseEditor: JsonResponseEditor,
         @Value("\${debugging:false}") private val debugMode: Boolean
 ) : DebugService {
     // When request debug mode is on, then recorder is not null.
@@ -49,6 +53,21 @@ class DebugServiceImpl(
 
     override fun createRequestDebugRecord(): DebugRecord? {
        return recorder?.toDebugRecord()
+    }
+
+    override fun debugRun(
+            response: HttpServletResponse,
+            run: (HttpServletResponse) -> Unit
+    ) {
+        enableRequestDebugMode()
+
+        val responseWrapper = ContentCachingResponseWrapper(response)
+        run(responseWrapper)
+
+        createRequestDebugRecord()?.let {
+            jsonResponseEditor.putField(responseWrapper, "_debug", it)
+        }
+        responseWrapper.copyBodyToResponse()
     }
 }
 

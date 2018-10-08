@@ -1,5 +1,6 @@
 package com.ymoch.study.server.service.impl
 
+import com.ymoch.study.server.filter.JsonResponseEditor
 import com.ymoch.study.server.record.debug.DebugRecord
 import com.ymoch.study.server.record.debug.ExceptionRecord
 import com.ymoch.study.server.service.DebugService
@@ -24,6 +25,9 @@ internal class DebugServiceImplTest {
     @Mock
     private lateinit var conversionService: ConversionService
 
+    @Mock
+    private lateinit var jsonResponseEditor: JsonResponseEditor
+
     private lateinit var service: DebugService
 
     @BeforeEach
@@ -40,7 +44,7 @@ internal class DebugServiceImplTest {
         @BeforeEach
         fun setUp() {
             MockitoAnnotations.initMocks(this)
-            service = DebugServiceImpl(conversionService, false)
+            service = DebugServiceImpl(conversionService, jsonResponseEditor, false)
 
             `when`(conversionService.convert(null, Boolean::class.java))
                     .thenReturn(null)
@@ -99,7 +103,7 @@ internal class DebugServiceImplTest {
 
         @BeforeEach
         fun setUp() {
-            service = DebugServiceImpl(conversionService, false)
+            service = DebugServiceImpl(conversionService, jsonResponseEditor, false)
         }
 
         @Test
@@ -121,7 +125,7 @@ internal class DebugServiceImplTest {
 
         @BeforeEach
         fun setUp() {
-            service = DebugServiceImpl(conversionService, true)
+            service = DebugServiceImpl(conversionService, jsonResponseEditor, true)
         }
 
         @Test
