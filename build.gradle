@@ -39,7 +39,7 @@ test {
 }
 
 jacoco {
-    toolVersion = "0.8.1"
+    toolVersion = "0.8.2"
 }
 
 jacocoTestReport {
@@ -53,8 +53,7 @@ jacocoTestCoverageVerification {
         classDirectories = fileTree(
                 dir: 'build/classes/kotlin/main/com/ymoch/study/server',
                 excludes: [
-                        'Application*.class',
-                        'record/**'
+                        'Application*.class'
                 ],
         )
     }
