@@ -1,4 +1,4 @@
-package com.ymoch.study.server.service.impl
+package com.ymoch.study.server.service.error
 
 import com.ymoch.study.server.exception.ApplicationRuntimeException
 import org.hamcrest.MatcherAssert.assertThat

@@ -1,8 +1,7 @@
-package com.ymoch.study.server.service.impl
+package com.ymoch.study.server.service.error
 
-import com.ymoch.study.server.record.ErrorRecord
+import com.ymoch.study.server.record.error.ErrorRecord
 import com.ymoch.study.server.exception.ApplicationRuntimeException
-import com.ymoch.study.server.service.ErrorService
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.NoHandlerFoundException

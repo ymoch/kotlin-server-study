@@ -1,9 +1,5 @@
-package com.ymoch.study.server.service.debug.impl
+package com.ymoch.study.server.service.debug
 
-import com.ymoch.study.server.service.debug.DebugRecorder
-import com.ymoch.study.server.service.debug.DebugService
-import com.ymoch.study.server.service.debug.JsonResponseEditor
-import com.ymoch.study.server.service.debug.ResponseWrapperFactory
 import org.springframework.context.annotation.Scope
 import org.springframework.core.convert.ConversionException
 import org.springframework.core.convert.ConversionService
@@ -14,7 +10,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Service
 @Scope(WebApplicationContext.SCOPE_REQUEST)
-class DebugServiceImpl(
+internal class DebugServiceImpl(
         private val conversionService: ConversionService,
         private val jsonResponseEditor: JsonResponseEditor,
         private val responseWrapperFactory: ResponseWrapperFactory

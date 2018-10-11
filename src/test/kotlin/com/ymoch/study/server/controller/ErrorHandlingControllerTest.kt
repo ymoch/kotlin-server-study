@@ -1,8 +1,8 @@
 package com.ymoch.study.server.controller
 
-import com.ymoch.study.server.record.ErrorRecord
+import com.ymoch.study.server.record.error.ErrorRecord
 import com.ymoch.study.server.service.debug.DebugService
-import com.ymoch.study.server.service.ErrorService
+import com.ymoch.study.server.service.error.ErrorService
 import com.ymoch.study.server.service.debug.DebugRecorder
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

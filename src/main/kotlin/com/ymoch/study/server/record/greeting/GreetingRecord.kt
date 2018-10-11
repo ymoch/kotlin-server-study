@@ -1,4 +1,4 @@
-package com.ymoch.study.server.record
+package com.ymoch.study.server.record.greeting
 
 data class GreetingRecord(
         val message: String,

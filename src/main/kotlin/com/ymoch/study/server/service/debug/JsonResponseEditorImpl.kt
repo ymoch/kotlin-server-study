@@ -1,14 +1,13 @@
-package com.ymoch.study.server.service.debug.impl
+package com.ymoch.study.server.service.debug
 
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.ymoch.study.server.service.debug.JsonResponseEditor
 import org.springframework.stereotype.Component
 import org.springframework.web.util.ContentCachingResponseWrapper
 
 @Component
-class JsonResponseEditorImpl(
+internal class JsonResponseEditorImpl(
         private val objectMapper: ObjectMapper
 ) : JsonResponseEditor {
 

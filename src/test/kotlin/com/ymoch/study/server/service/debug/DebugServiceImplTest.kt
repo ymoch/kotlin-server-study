@@ -1,10 +1,6 @@
-package com.ymoch.study.server.service.impl
+package com.ymoch.study.server.service.debug
 
 import com.ymoch.study.server.record.debug.DebugRecord
-import com.ymoch.study.server.service.debug.DebugService
-import com.ymoch.study.server.service.debug.JsonResponseEditor
-import com.ymoch.study.server.service.debug.ResponseWrapperFactory
-import com.ymoch.study.server.service.debug.impl.DebugServiceImpl
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach

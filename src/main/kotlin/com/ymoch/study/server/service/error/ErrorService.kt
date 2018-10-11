@@ -1,6 +1,6 @@
-package com.ymoch.study.server.service
+package com.ymoch.study.server.service.error
 
-import com.ymoch.study.server.record.ErrorRecord
+import com.ymoch.study.server.record.error.ErrorRecord
 import java.lang.Exception
 
 interface ErrorService {

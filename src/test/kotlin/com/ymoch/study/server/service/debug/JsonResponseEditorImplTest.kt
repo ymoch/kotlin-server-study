@@ -1,7 +1,6 @@
-package com.ymoch.study.server.filter.impl
+package com.ymoch.study.server.service.debug
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.ymoch.study.server.service.debug.impl.JsonResponseEditorImpl
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach

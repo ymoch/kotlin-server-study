@@ -1,4 +1,4 @@
-package com.ymoch.study.server.service.debug.impl
+package com.ymoch.study.server.service.debug
 
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers

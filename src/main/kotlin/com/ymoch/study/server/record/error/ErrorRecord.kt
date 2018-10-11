@@ -1,4 +1,4 @@
-package com.ymoch.study.server.record
+package com.ymoch.study.server.record.error
 
 import org.springframework.http.HttpStatus
 

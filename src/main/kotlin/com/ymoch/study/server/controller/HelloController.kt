@@ -1,6 +1,6 @@
 package com.ymoch.study.server.controller
 
-import com.ymoch.study.server.record.GreetingRecord
+import com.ymoch.study.server.record.greeting.GreetingRecord
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
