@@ -1,5 +1,7 @@
 package com.ymoch.study.server.configuration
 
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -40,7 +42,10 @@ internal class LoggerConfigurationTest {
         }
 
         @Test
-        fun thenReturnsLogger() = testCreatesLogger()
+        fun thenReturnsLogger() {
+            testLoggerName(
+                    "com.ymoch.study.server.configuration.LoggerConfigurationTest")
+        }
     }
 
     @Nested
@@ -54,17 +59,21 @@ internal class LoggerConfigurationTest {
         @Nested
         inner class WhenInjectionPointHasField {
 
-            private var logger: Logger? = null
+            private var loggerInjectedField: Logger? = null
 
             @BeforeEach
             fun setUp() {
                 val field = WhenInjectionPointHasField::class.java
-                        .getDeclaredField("logger")
+                        .getDeclaredField("loggerInjectedField")
                 `when`(injectionPoint.field).thenReturn(field)
             }
 
             @Test
-            fun thenReturnsLogger() = testCreatesLogger()
+            fun thenReturnsLogger() = testLoggerName(
+                    "com.ymoch.study.server.configuration.LoggerConfigurationTest"
+                            + "\$WhenInjectionPointHasNoMethodParameter"
+                            + "\$WhenInjectionPointHasField")
+
         }
 
         @Nested
@@ -80,13 +89,15 @@ internal class LoggerConfigurationTest {
         }
     }
 
-    fun testCreatesLogger() {
-        loggerConfiguration.logger(injectionPoint)
-    }
-
     fun testThrowsException() {
-        assertThrows(BeanCreationException::class.java) {
+        val exception = assertThrows(BeanCreationException::class.java) {
             loggerConfiguration.logger(injectionPoint)
         }
+        assertThat(exception.message, equalTo("Cannot find the type for Logger."))
+    }
+
+    fun testLoggerName(expectedName: String) {
+        val logger = loggerConfiguration.logger(injectionPoint)
+        assertThat(logger.name, equalTo(expectedName))
     }
 }

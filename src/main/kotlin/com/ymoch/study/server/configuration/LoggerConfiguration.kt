@@ -28,6 +28,6 @@ class LoggerConfiguration {
             return field.declaringClass
         }
 
-        throw BeanCreationException("Cannot find type for Logger.")
+        throw BeanCreationException("Cannot find the type for Logger.")
     }
 }

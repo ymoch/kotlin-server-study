@@ -10,7 +10,7 @@ import java.lang.Exception
 val DEFAULT_STATUS = HttpStatus.INTERNAL_SERVER_ERROR
 
 @Service
-class ErrorServiceImpl : ErrorService {
+internal class ErrorServiceImpl : ErrorService {
 
     override fun createRecord(exception: Exception): ErrorRecord {
         val status = when (exception) {
