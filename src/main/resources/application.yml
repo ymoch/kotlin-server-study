@@ -9,4 +9,9 @@ server:
   servlet:
     contextPath: /api
 
+info:
+  app:
+    name: ${name}
+    version: ${version}
+
 debugging: true

@@ -14,6 +14,7 @@ buildscript {
     }
 }
 
+apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-spring'
 apply plugin: 'eclipse'
@@ -69,6 +70,10 @@ jacocoTestCoverageVerification {
 
 repositories {
     mavenCentral()
+}
+
+processResources {
+    expand(project.properties)
 }
 
 dependencies {
